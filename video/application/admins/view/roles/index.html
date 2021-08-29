@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>角色管理</title>
+	<link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+	<script type="text/javascript" src="__STATIC__/plugins/layui/layui.js"></script>
+	<style type="text/css">
+		.header span{background: #dddddd;margin-left: 30px;padding: 10px;color: #bb00bb;}
+		.header div{border-bottom: solid 3px #000000;margin-top: 10px;}
+		
+	</style>
+</head>
+<body style="padding: 10px;">
+	<div class="header">
+		<span>角色列表</span>
+		<button class="layui-btn layui-btn-xs" style="float: right;" onclick="add()">Add+</button>
+		<div></div>
+	</div>
+	<table class="layui-table">
+		<thead>
+		<tr>
+			<th>ID</th>
+			<td>角色名称</td>
+			<td>操作</td>
+		</tr>
+	</thead>
+	<tbody>
+			{volist name="data.roles" id="vo"}
+			<tr>
+				<th>{$vo.gid}</th>
+				<td>{$vo.title}</td>
+				<td>
+					<button class="layui-btn layui-btn-warm layui-btn-xs" onclick="add({$vo.gid})">Change</button>
+					<button class="layui-btn layui-btn-danger layui-btn-xs" onclick="del({$vo.gid})">Delete</button>
+				</td>
+			</tr>
+			{/volist}
+		</tbody>
+	</table>
+
+</body>
+</html>
+<script type="text/javascript">
+	layui.use(['layer'],function(){
+		$ = layui.jquery;
+		layer = layui.layer;
+	});
+
+	// 添加
+	//将gid传到Roles.php后台处理
+	//带gid跳转
+	function add(gid){
+		layer.open({
+		  type: 2,
+		  title: gid>0?'编辑角色':'添加角色',
+		  shade: 0.3,
+		  area: ['480px', '420px'],
+		  content: '/admins.php/admins/Roles/add?gid='+gid
+		})
+	}
+
+	// 删除
+	function del(gid){
+		layer.confirm('Are you sure？', {
+			  icon:3,
+			  btn: ['Y','N']
+			}, function(){
+			  $.post('/admins.php/admins/roles/deletes',{'gid':gid},function(res){
+			  	if(res.code>0){
+			  		layer.alert(res.msg,{icon:2});
+			  	}else{
+			  		layer.msg(res.msg);
+			  		setTimeout(function(){window.location.reload();},1000);
+			  	}
+			  },'json');
+			});
+	}
+</script>
